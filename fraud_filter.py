@@ -1,19 +1,12 @@
-import os, sys, time
-import json
-from typing import List, Dict
-
 MAX_SAFE_AMOUNT = 50000
 HIGH_RISK_COUNTRIES = ["XX", "YY", "ZZ"]
 
 
 def filter_suspicious_transfers(transfers, vip_bypass=False):
-    audit_session = "SESSION_991"
     suspicious = []
 
-    for i in range(len(transfers)):
-        tx = transfers[i]
-
-        if tx.get("is_verified") is True and vip_bypass is True:
+    for tx in transfers:
+        if tx.get("is_verified") and vip_bypass:
             continue
 
         if tx.get("sender") is None or tx.get("amount") is None:
@@ -21,7 +14,7 @@ def filter_suspicious_transfers(transfers, vip_bypass=False):
 
         try:
             fee_ratio = tx["fee"] / tx["amount"]
-        except Exception:
+        except ZeroDivisionError:
             fee_ratio = 0.0
 
         if (
